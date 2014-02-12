@@ -12,7 +12,7 @@ git clone git://github.com/monknomo/clide.git $HOME/.clide
 Assuming you installed the scripts to the above path, make them executable and add them to your path
 ```
 sudo chmod a+x $HOME/.clide/slide*
-$ echo 'export PATH="$HOME/.clide:$PATH"' >> ~/.bashrc
+echo 'export PATH="$HOME/.clide:$PATH"' >> ~/.bashrc
 ```
 Type 'slideshow -h' for this list of commands:
 ```
