@@ -1,0 +1,19 @@
+#!/usr/bin/env python
+
+import os
+import json
+
+if __name__ == "__main__":
+    base_dir = os.path.dirname(os.path.realpath(__file__))
+    dst = "{0}/current/slideshow.json".format(base_dir)  
+    try:
+        with open(dst, 'r') as json_file:
+            slideshow = json.load(json_file)
+    except IOError:
+        sys.exit("Something has gone seriously wrong with the current slideshow directory")
+    print(slideshow["slides"][slideshow["current_slide"]])
+    slideshow["current_slide"] += 1
+    if slideshow["current_slide"] >= len(slideshow["slides"]):
+        slideshow["current_slide"] = 0
+    with open(dst, 'w') as json_file:
+        json.dump(slideshow, json_file)
