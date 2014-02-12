@@ -13,6 +13,7 @@ Assuming you installed the scripts to the above path, make them executable and a
 ```
 sudo chmod a+x $HOME/.clide/slide*
 echo 'export PATH="$HOME/.clide:$PATH"' >> ~/.bashrc
+source ~/.bashrc
 ```
 Type 'slideshow -h' for this list of commands:
 ```
