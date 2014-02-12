@@ -1,0 +1,162 @@
+#!/usr/bin/env python
+
+import argparse
+import os
+import sys
+import shutil
+import json
+
+def parse_slideshow(slideshow, is_base=False):
+    try:
+        with open(slideshow, 'r') as json_file:
+            return json.load(json_file)
+    except IOError:
+        if is_base:
+            sys.exit("Something has gone seriously wrong with the current slideshow directory")
+        else:
+            sys.exit("{0} not found".format(slideshow))
+
+def _set_dst(dst):
+    if dst is None:
+        base_dir = os.path.dirname(os.path.realpath(__file__))
+        return "{0}/current/slideshow.json".format(base_dir) 
+    else:
+        return dst
+            
+def show(dst):
+    base_dir = None
+    dst = _set_dst(dst) 
+    slideshow = parse_slideshow(dst, is_base=(base_dir is not None))
+    print(json.dumps(slideshow, sort_keys=True, indent=2))
+    
+def switch(target):
+    base_dir = os.path.dirname(os.path.realpath(__file__))
+    dst = "{0}/current/slideshow.json".format(base_dir)
+    shutil.copyfile(target,
+                    dst)
+    slideshow = parse_slideshow(dst, is_base=True)
+    with open(dst, 'w') as json_file:
+        slideshow["current_slide"] = 0
+        json.dump(slideshow, json_file)
+        
+        
+def start_at(index, dst):
+    try:
+        index = int(index[0])
+    except ValueError:
+        sys.exit("Index must be an integer")
+    base_dir = None
+    dst = _set_dst(dst) 
+        
+    slideshow = parse_slideshow(dst, is_base=(base_dir is not None))
+        
+    if index >= len(slideshow["slides"]):
+            sys.exit("Index must be less than the number of slides in the slideshow")
+    elif index < 0:
+        sys.exit("Index must be positive")
+        
+    with open(dst, 'w') as json_file:
+        slideshow["current_slide"] = index
+        json.dump(slideshow, json_file)
+        
+def new_slide(slides):
+    if slides is None or len(slides) == 0:
+        sys.exit("Slides have to have at least *some* text")
+    base_dir=None
+    if len(slides) == 1:
+        base_dir = os.path.dirname(os.path.realpath(__file__))
+        dst = "{0}/current/slideshow.json".format(base_dir)  
+    else:
+        dst = slides[-1]
+        slides = slides[:-1]
+    slideshow = parse_slideshow(dst, is_base=(base_dir is not None))
+    with open(dst, 'w') as json_file:
+        slideshow["slides"].extend(slides)
+        json.dump(slideshow, json_file)
+        
+def new_slideshow(dst):
+    if dst is None:
+        sys.exit("Must specify a filename")
+    skeleton = {"current_slide": 0, "clear_screen": True, "slides": []}
+    with open(dst, 'w') as json_file:
+        json.dump(skeleton, json_file)
+        
+def clear(dst):
+    base_dir = None
+    dst = _set_dst(dst) 
+    slideshow = parse_slideshow(dst, is_base=(base_dir is not None))
+    with open(dst, 'w') as json_file:
+        slideshow["clear_screen"] = True
+        json.dump(slideshow, json_file)
+        
+def no_clear(dst):
+    base_dir = None
+    dst = _set_dst(dst) 
+    slideshow = parse_slideshow(dst, is_base=(base_dir is not None))
+    with open(dst, 'w') as json_file:
+        slideshow["clear_screen"] = False
+        json.dump(slideshow, json_file)
+
+def save(dst):
+    base_dir = os.path.dirname(os.path.realpath(__file__))
+    src = "{0}/current/slideshow.json".format(base_dir)
+    if dst is not None:
+        shutil.copy(src, dst)
+    else:
+        sys.exit("Must have a destination filename")
+
+def main():
+    d="slideshow - Create and edit command line slideshows"
+    parser = argparse.ArgumentParser(description=d)
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument('--switch', action='store_true', 
+                        help="Sets the slideshow dst to the current "\
+                                "slideshow")
+    group.add_argument('--start-at', nargs=1, metavar="INDEX",
+                        help="Sets the starting slide using 0 based indexing "\
+                                "therefore the first slide is at position 0."\
+                                " Changes dst slideshow, defaults to current")
+    group.add_argument('--new-slide', nargs='*', 
+                        help="Adds N new slides with text 'NEW_SLIDE' to the "\
+                                "slideshow 'dst', space delimited.  Use quotes"\
+                                " to separate slides")
+    group.add_argument('--new', action='store_true',
+                        help="Create a new slideshow at dst.  Overwrites "\
+                                "existing files.")
+    group.add_argument('--clear', action='store_true',
+                        help="sets the dst slideshow to clear before "\
+                                "displaying a slide")
+    group.add_argument('--noclear', action='store_true',
+                        help="sets the dst slideshow to not clear before "\
+                                "displaying a slide")
+    group.add_argument('--show', action='store_true', 
+                        help="Shows the entire slideshow at dst, defaults to "\
+                                "the current slideshow")
+    group.add_argument('--save', action='store_true',
+                        help="Saves the current slideshow to dst")
+    parser.add_argument('dst', nargs='?', 
+                        help="The filesystem location of a slideshow")
+    args = parser.parse_args()
+    if args.new:
+        new_slideshow(args.dst)
+    elif args.new_slide is not None:
+        new_slide(args.new_slide)
+    elif args.start_at is not None:
+        start_at(args.start_at, args.dst)
+    elif args.clear:
+        clear(args.dst)
+    elif args.noclear:
+        no_clear(args.dst)
+    elif args.switch:
+        switch(args.dst)
+    elif args.show:
+        show(args.dst)
+    elif args.save:
+        save(args.dst)
+    else:
+        show(args.dst)
+    
+if __name__ == "__main__":
+    main()
+
+	
