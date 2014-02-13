@@ -1,7 +1,7 @@
 clide
 =====
 
-Clide is a command line slideshow.  The name is a combination of cli (command line interface) and slide.  The idea is you create a text slide deck, queue it up and then every time you type "slide" into the command line, the next line of text appears.
+Clide is a command line slideshow.  The name is a combination of cli (command line interface) and slide.  Clide allows you create a text slide deck, and display 'slides' sequentially on the command line whenever you type 'slide'.
 
 Installation
 ------------
