@@ -1,21 +1,26 @@
 clide
 =====
 
-Clide is a command line slideshow.  The name is a combination of cli (command line interface) and slide.  Clide allows you create a text slide deck, and display 'slides' sequentially on the command line whenever you type 'slide'.
+Clideshow is a command line slideshow.  The name is a combination of cli (command line interface) and slideshows.
+Clideshow allows you create a text slide deck, and display 'slides' sequentially on the command line whenever you type
+'slide'.
 
 Installation
 ------------
-Clone this repository.  $HOME/.clide is a good location for the scripts to live
+Clone this repository.  $HOME/.clideshow is a good location for the scripts to live
 ```
-git clone git://github.com/monknomo/clide.git $HOME/.clide
+git clone git://github.com/monknomo/clideshow.git $HOME/.clideshow
 ```
 Assuming you installed the scripts to the above path, make them executable and add them to your path
 ```
-sudo chmod a+x $HOME/.clide/slide*
-echo 'export PATH="$HOME/.clide:$PATH"' >> ~/.bashrc
+sudo chmod a+x $HOME/.clideshow/clideshow
+sudo chmoe a+x $HOME/.clideshow/slide
+echo 'export PATH="$HOME/.clideshow:$PATH"' >> ~/.bashrc
 source ~/.bashrc
 ```
-Type 'slideshow -h' for this list of commands:
+Non-Ubuntu users may wish to change .bashrc to .bash_profile
+
+Type 'clideshow -h' for this list of commands:
 ```
 slideshow - Create and edit command line slideshows
 
