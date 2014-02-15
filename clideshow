@@ -12,7 +12,8 @@ def parse_slideshow(slideshow, is_base=False):
             return json.load(json_file)
     except IOError:
         if is_base:
-            sys.exit("Something has gone seriously wrong with the current slideshow directory")
+            sys.exit("Something has gone seriously wrong with the current "\
+                     "slideshow directory")
         else:
             sys.exit("{0} not found".format(slideshow))
 
@@ -51,7 +52,8 @@ def start_at(index, dst):
     slideshow = parse_slideshow(dst, is_base=(base_dir is not None))
         
     if index >= len(slideshow["slides"]):
-            sys.exit("Index must be less than the number of slides in the slideshow")
+            sys.exit("Index must be less than the number of slides in the "\
+                     "slideshow")
     elif index < 0:
         sys.exit("Index must be positive")
         
@@ -105,11 +107,50 @@ def save(dst):
     else:
         sys.exit("Must have a destination filename")
 
+
+def show_specifc(slide, dst):
+    base_dir = None
+    dst = _set_dst(dst)
+    slideshow = parse_slideshow(dst, is_base=(base_dir is not None))
+    if(slideshow['slides'] is not None
+       and len(slideshow['slides']) > 0
+       and slide > -1):
+        print(json.dumps(slideshow['slides'][slide], sort_keys=True, indent=2))
+    elif slide < 0:
+        print("The show slide argument must be a positive integer")
+    elif (slideshow['slides'] is None or
+            len(slideshow['slides']) < 1):
+        print("The clideshow doesn't have any slides")
+    else:
+        sys.exit("Malformed slideshow or non-integer argument, try again")
+
+
+def edit(edit, dst):
+    index = int(edit[0])
+    slide = edit[1]
+    base_dir = None
+    dst = _set_dst(dst)
+    slideshow = parse_slideshow(dst, is_base=(base_dir is not None))
+    if(slideshow['slides'] is not None
+       and len(slideshow['slides']) > 0
+       and index > -1):
+        slideshow['slides'][index] = slide
+        with open(dst, 'w') as json_file:
+            json.dump(slideshow, json_file)
+    elif index < 0:
+        print("The index must be a positive integer")
+    elif (slideshow['slides'] is None or
+            len(slideshow['slides']) < 1):
+        print("The clideshow doesn't have any slides")
+    else:
+        sys.exit("Malformed clideshow or non-integer argument, try again")
+
+
 def main():
-    d="slideshow - Create and edit command line slideshows"
+    d="clideshow - Create and edit command line slideshows"
     parser = argparse.ArgumentParser(description=d)
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('w', '--switch', action='store_true',
+    group.add_argument('-w', '--switch', action='store_true',
                         help="Sets the slideshow dst to the current "\
                                 "slideshow")
     group.add_argument('-sa', '--start-at', nargs=1, metavar="INDEX",
@@ -129,14 +170,16 @@ def main():
     group.add_argument('-nc', '--noclear', action='store_true',
                         help="sets the dst slideshow to not clear before "\
                                 "displaying a slide")
-    group.add_argument('--show', action='store_true', 
-                        help="Shows the entire slideshow at dst, defaults to "\
-                                "the current slideshow")
+    group.add_argument('-sh', '--show',  nargs='?', type=int, metavar="N",
+                        help="Shows the Nth slide of the slideshow at dst")
     group.add_argument('-s', '--save', action='store_true',
                         help="Saves the current slideshow to dst")
+    group.add_argument('-e', '--edit', nargs=2, metavar="N",
+                       help="Set the Nth slide's text to the second argument")
     parser.add_argument('dst', nargs='?', 
                         help="The filesystem location of a slideshow")
     args = parser.parse_args()
+    print(args)
     if args.new:
         new_slideshow(args.dst)
     elif args.new_slide is not None:
@@ -149,8 +192,10 @@ def main():
         no_clear(args.dst)
     elif args.switch:
         switch(args.dst)
-    elif args.show:
-        show(args.dst)
+    elif args.show is not None:
+        show_specifc(args.show, args.dst)
+    elif args.edit is not None:
+        edit(args.edit, args.dst)
     elif args.save:
         save(args.dst)
     else:
@@ -158,5 +203,3 @@ def main():
     
 if __name__ == "__main__":
     main()
-
-	
