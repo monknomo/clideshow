@@ -1,5 +1,5 @@
-clide
-=====
+clideshow
+==========
 
 Clideshow is a command line slideshow.  The name is a combination of cli (command line interface) and slideshows.
 Clideshow allows you create a text slide deck, and display 'slides' sequentially on the command line whenever you type
@@ -52,6 +52,14 @@ optional arguments:
 Usage
 -----
 
-After you have created a new slideshow with --new and added a few slides to it with --new-slide "my slide text" use the command slide (just imagine you are yelling at a projector assistant) and you should see the text from your first slide appear in the console.
+After you have created a new slideshow with --new and added a few slides to it with --new-slide "my slide text" use the command slide to display the slides from your current slideshow.  I like to imagine I'm yelling "Slide!" to my projectionist.
+
+```
+> clideshow -n myfirstslideshow.json
+> clideshow -w myfirstslideshow.json
+> clideshow -ns "My first slide" "my second slide"
+> slide
+My first slide
+```
 
 
