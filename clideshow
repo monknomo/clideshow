@@ -69,8 +69,14 @@ def new_slide(slides):
         base_dir = os.path.dirname(os.path.realpath(__file__))
         dst = "{0}/current/slideshow.json".format(base_dir)  
     else:
-        dst = slides[-1]
-        slides = slides[:-1]
+        try:
+            with open(slides[-1], 'r') as json_file:
+                json.load(json_file)
+            dst = slides[-1]
+            slides = slides[:-1]
+        except IOError:
+            base_dir = os.path.dirname(os.path.realpath(__file__))
+            dst = "{0}/current/slideshow.json".format(base_dir)
     slideshow = parse_slideshow(dst, is_base=(base_dir is not None))
     with open(dst, 'w') as json_file:
         slideshow["slides"].extend(slides)
