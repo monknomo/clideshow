@@ -2,6 +2,7 @@
 
 import os
 import json
+import argparse
 
 if __name__ == "__main__":
     base_dir = os.path.dirname(os.path.realpath(__file__))
@@ -11,9 +12,22 @@ if __name__ == "__main__":
             slideshow = json.load(json_file)
     except IOError:
         sys.exit("Something has gone seriously wrong with the current slideshow directory")
-    print(slideshow["slides"][slideshow["current_slide"]])
-    slideshow["current_slide"] += 1
-    if slideshow["current_slide"] >= len(slideshow["slides"]):
+
+    d="slide - show slides made with clideshow"
+    parser = argparse.ArgumentParser(description=d)
+    parser.add_argument('-b', '--back', action='store_true',
+                        help="Show the last slide")
+    args = parser.parse_args()
+    if args.back is None:
+        slideshow["current_slide"] -= 1
+        print(slideshow["slides"][slideshow["current_slide"]])
+    else:
+        print(slideshow["slides"][slideshow["current_slide"]])
+        slideshow["current_slide"] += 1
+
+    if (slideshow["current_slide"] >= len(slideshow["slides"])
+        or slideshow["current_slide"] < 0):
         slideshow["current_slide"] = 0
+
     with open(dst, 'w') as json_file:
         json.dump(slideshow, json_file)
